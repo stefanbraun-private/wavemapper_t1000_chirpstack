@@ -1,0 +1,40 @@
+# extracted some parts from template https://github.com/github/gitignore/blob/master/Python.gitignore
+# added special parts for "wavemappper"
+# Stefan Braun, August 13th 2024
+
+
+# wavemapper
+.env
+database.sqlite
+uplink_debug_logfile.txt
+uplink_debug_logfile*.txt
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.idea/
+assets/
+

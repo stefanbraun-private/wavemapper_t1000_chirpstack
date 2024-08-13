@@ -1,0 +1,25 @@
+# EXAMPLE configuration file
+# with help from https://github.com/sloria/environs
+
+# ==>rename it to ".env",
+#    or add all settings as environment variables
+
+# SQLite database
+DATABASE_FILENAME=database.sqlite
+
+# resolution of all locations
+H3_RESOLUTION=7
+
+
+
+# MQTT Broker
+MQTT_BROKER_USERNAME=user
+MQTT_BROKER_PASSWORD=pass
+MQTT_BROKER_HOST=host
+MQTT_BROKER_PORT=port
+MQTT_BROKER_ENABLE_TLS=True
+
+
+# Folium map
+MAP_CENTER_LATITUDE=47.4239894
+MAP_CENTER_LONGITUDE=9.3797159

@@ -1,0 +1,7 @@
+Flask==2.2.2
+paho-mqtt==1.6.1
+geojson==3.0.1
+folium==0.14.0
+pony==0.7.16
+h3==3.7.6
+environs==9.5.0
