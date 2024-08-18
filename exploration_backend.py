@@ -20,7 +20,32 @@ def get_exploration_map():
 
     geojson_dict = generate_geojson()
     if geojson_dict:
-        color_hex = 'red'
+        # convert properties of GeoJSON object into Folium / Leaflet properties
+
+        # add mouse hover popup
+        # with help from https://python-visualization.github.io/folium/latest/user_guide/geojson/geojson_popup_and_tooltip.html
+        popup = folium.GeoJsonPopup(
+            fields=['score'],
+            aliases=['Score'],
+            localize=True,
+            labels=True,
+            style='background-color: yellow;',
+        )
+
+        tooltip = folium.GeoJsonTooltip(
+            fields=['score'],
+            aliases=['Score'],
+            localize=True,
+            sticky=False,
+            labels=True,
+            style="""
+                background-color: #F0EFEF;
+                border: 2px solid black;
+                border-radius: 3px;
+                box-shadow: 3px;
+            """,
+            max_width=800,
+        )
 
         nof_cells = 0
         with lock:
@@ -28,7 +53,12 @@ def get_exploration_map():
 
         style_function = lambda x: {'fillColor': x['properties']['fill'], 'color': x['properties']['stroke']}
         curr_name = "Wave-Mapping [{} cells]".format(nof_cells)
-        folium.GeoJson(data=geojson_dict, name=curr_name, style_function=style_function).add_to(m)
+        folium.GeoJson(data=geojson_dict,
+                       name=curr_name,
+                       style_function=style_function,
+                       tooltip=tooltip,
+                       popup=popup,
+                       ).add_to(m)
 
     folium.LayerControl().add_to(m)
 
@@ -86,27 +116,22 @@ def generate_geojson():
         avg_score = total_score / len(cells)
         #print("total_score={}, avg_score={}".format(total_score, avg_score))
 
-        polygons_blue = []
-        polygons_green = []
-        polygons_red = []
+        feature_list = []
         for cell, score in cells:
+            # convert one cell into a polygon
             polygon_set_of_sets = h3.h3_to_geo_boundary(h=cell, geo_json=True)
             if score == 1:
                 # minimum score
-                polygons_blue.append((list(polygon_set_of_sets),))
+                color = "blue"
             elif score > avg_score:
                 # maximum "height" of wave
-                polygons_red.append((list(polygon_set_of_sets),))
+                color = "red"
             else:
                 # wave has settled down
-                polygons_green.append((list(polygon_set_of_sets),))
+                color = "green"
 
-        feature_list = []
-        for polygons, color in [(polygons_blue, "blue"),
-                                (polygons_green, "green"),
-                                (polygons_red, "red")]:
-            multi_polygon = geojson.MultiPolygon(polygons)
-            feature = geojson.Feature(geometry=multi_polygon, properties={'fill': color, 'stroke': color})
+            polygon_obj = geojson.Polygon([polygon_set_of_sets])
+            feature = geojson.Feature(geometry=polygon_obj, properties={'fill': color, 'stroke': color, 'score': score})
             feature_list.append(feature)
         feature_collection = geojson.FeatureCollection(feature_list)
         return feature_collection
