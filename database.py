@@ -10,7 +10,6 @@ import datetime
 import h3
 
 
-
 db = Database()
 # SQLite in-memory versus permanent storage:
 #db.bind(provider='sqlite', filename=':memory:')
@@ -37,11 +36,15 @@ def get_trackers():
 	trackers = select(t for t in Tracker)
 	return [(t.device_name, t.dev_eui, t.score) for t in trackers]
 
+class CellStatistics(object):
+	def __init__(self, cell, score):
+		self.cell = cell
+		self.score = score
 
 @db_session
 def get_explorations():
 	explorations = select(e for e in Exploration if e.score > 0)
-	return [(e.cell, e.score) for e in explorations]
+	return [CellStatistics(e.cell, e.score) for e in explorations]
 
 
 @db_session

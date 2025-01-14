@@ -110,28 +110,28 @@ def generate_geojson():
 
 
         # separate hexes by score
-        total_score = 0
-        for cell, score in cells:
-            total_score += score
-        avg_score = total_score / len(cells)
-        #print("total_score={}, avg_score={}".format(total_score, avg_score))
+        # =>sorting list by score, then split list
+        cells = sorted(cells, key=lambda x: x.score)
+        nof_cells = len(cells)
 
         feature_list = []
-        for cell, score in cells:
+        for idx, cell_stat in enumerate(cells):
             # convert one cell into a polygon
-            polygon_set_of_sets = h3.h3_to_geo_boundary(h=cell, geo_json=True)
-            if score == 1:
-                # minimum score
+            polygon_set_of_sets = h3.h3_to_geo_boundary(h=cell_stat.cell, geo_json=True)
+
+            # set color for the three score groups
+            if idx <= nof_cells * 0.4:
+                # low activity
                 color = "blue"
-            elif score > avg_score:
-                # maximum "height" of wave
-                color = "red"
-            else:
+            elif idx <= nof_cells * 0.8:
                 # wave has settled down
                 color = "green"
+            else:
+                # maximum "height" of wave
+                color = "red"
 
             polygon_obj = geojson.Polygon([polygon_set_of_sets])
-            feature = geojson.Feature(geometry=polygon_obj, properties={'fill': color, 'stroke': color, 'score': score})
+            feature = geojson.Feature(geometry=polygon_obj, properties={'fill': color, 'stroke': color, 'score': cell_stat.score})
             feature_list.append(feature)
         feature_collection = geojson.FeatureCollection(feature_list)
         return feature_collection
